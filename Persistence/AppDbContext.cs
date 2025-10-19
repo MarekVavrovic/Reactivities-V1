@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Persistence;
 
-public class AppDbContext(DbContextOptions options):IdentityUserContext<User>(options)
+public class AppDbContext(DbContextOptions options) : IdentityDbContext<User>(options)
 {
-public required DbSet<Activity> Activities { get; set; }
+    public required DbSet<Activity> Activities { get; set; }
 }
