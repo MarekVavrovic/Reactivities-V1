@@ -10,7 +10,10 @@ const sleep = (delay: number) => {
   });
 };
 
-const agent = axios.create({ baseURL: import.meta.env.VITE_API_URL });
+const agent = axios.create({
+  baseURL: import.meta.env.VITE_API_URL,
+  withCredentials: true,
+});
 
 agent.interceptors.request.use((config) => {
   store.uiStore.isBusy();
@@ -27,7 +30,7 @@ agent.interceptors.response.use(
   async (error) => {
     await sleep(1000);
     store.uiStore.isIdle();
-    
+
     const { status, data } = error.response;
     switch (status) {
       case 400:
@@ -47,10 +50,10 @@ agent.interceptors.response.use(
         toast.error(`Unauthorised Motherfucker`);
         break;
       case 404:
-        router.navigate("/not-found",);
+        router.navigate("/not-found");
         break;
       case 500:
-        router.navigate("/server-error",{state:{error:data}})
+        router.navigate("/server-error", { state: { error: data } });
         break;
       default:
         break;
