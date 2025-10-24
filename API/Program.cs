@@ -2,8 +2,10 @@ using API.Middleware;
 using Application.Activities.Queries;
 using Application.Activities.Validators;
 using Application.Core;
+using Application.Interfaces;
 using Domain;
 using FluentValidation;
+using Infrastructure.Security;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Authorization;
@@ -28,10 +30,14 @@ builder.Services.AddDbContext<AppDbContext>(opt =>
 builder.Services.AddCors();
 
 //Mediator service
-builder.Services.AddMediatR(x => {
+builder.Services.AddMediatR(x =>
+{
     x.RegisterServicesFromAssemblyContaining<GetActivityList.Handler>();
     x.AddOpenBehavior(typeof(ValidationBehavior<,>));
 });
+
+//joined tables
+builder.Services.AddScoped<IUserAccessor, UserAccessor>();
 //AutoMapper
 builder.Services.AddAutoMapper(typeof(MappingProfiles).Assembly);
 //validator
@@ -39,12 +45,20 @@ builder.Services.AddValidatorsFromAssemblyContaining<CreateActivityValidator>();
 //IMiddleware
 builder.Services.AddTransient<ExceptionMiddleware>();
 //identity services
-builder.Services.AddIdentityApiEndpoints<User>(opt => 
+builder.Services.AddIdentityApiEndpoints<User>(opt =>
 {
     opt.User.RequireUniqueEmail = true;
 })
 .AddRoles<IdentityRole>()
 .AddEntityFrameworkStores<AppDbContext>();
+
+builder.Services.AddAuthorizationBuilder()
+    .AddPolicy("IsActivityHost", policy =>
+    {
+        policy.Requirements.Add(new IsHostRequirement());
+    });
+    
+builder.Services.AddTransient<IAuthorizationHandler, IsHostRequirementHandler>();
 
 
 var app = builder.Build();
