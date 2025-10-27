@@ -23,12 +23,12 @@ agent.interceptors.request.use((config) => {
 //targeting response, using response
 agent.interceptors.response.use(
   async (response) => {
-    await sleep(1000);
+    await sleep(500);
     store.uiStore.isIdle(); //swich off loading
     return response;
   },
   async (error) => {
-    await sleep(1000);
+    await sleep(500);
     store.uiStore.isIdle();
 
     const { status, data } = error.response;
