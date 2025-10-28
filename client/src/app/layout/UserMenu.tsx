@@ -25,7 +25,7 @@ export default function UserMenu() {
         <>
             <Button onClick={handleClick} color='inherit' size='large'sx={{ fontSize: '1.1rem' }}>
                 <Box display='flex' alignItems='center' gap={2}>
-                    <Avatar />
+                    <Avatar src={currentUser?.imageUrl} alt='current user'/>
                     {currentUser?.displayName}
                 </Box>
             </Button>
@@ -40,7 +40,7 @@ export default function UserMenu() {
                     </ListItemIcon>
                     <ListItemText>Create Activity</ListItemText>
                 </MenuItem>
-                <MenuItem component={Link} to='/profile' onClick={handleClose}>
+                <MenuItem component={Link} to={`/profiles/${currentUser?.id}`} onClick={handleClose}>
                     <ListItemIcon>
                         <Person />
                     </ListItemIcon>
