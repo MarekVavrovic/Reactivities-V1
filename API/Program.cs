@@ -1,4 +1,5 @@
 using API.Middleware;
+using API.SignalR;
 using Application.Activities.Queries;
 using Application.Activities.Validators;
 using Application.Core;
@@ -29,6 +30,8 @@ builder.Services.AddDbContext<AppDbContext>(opt =>
 
 //CORS service
 builder.Services.AddCors();
+//signalR
+builder.Services.AddSignalR();
 
 //Mediator service
 builder.Services.AddMediatR(x =>
@@ -82,6 +85,9 @@ app.UseAuthorization();
 
 app.MapControllers();
 app.MapGroup("api").MapIdentityApi<User>(); //api/login
+
+
+app.MapHub<CommentHub>("/comments"); //signalR middleware
 
 using var scope = app.Services.CreateScope();
 var services = scope.ServiceProvider;
