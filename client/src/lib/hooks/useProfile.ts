@@ -1,19 +1,38 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import agent from "../api/agent";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import type { EditProfileSchema } from "../schemas/editProfileSchema";
 
 export const useProfile = (id?: string, predicate?: string) => {
 
+  const [filter, setFilter] = useState<string | null>(null);
   const queryClient = useQueryClient();
 
+  //get user profile
   const { data: profile, isLoading: loadingProfile } = useQuery<Profile>({
     queryKey: ["profile", id],
     queryFn: async () => {
       const response = await agent.get<Profile>(`/profiles/${id}`);
       return response.data;
     },
-     enabled: !!id && !predicate
+    enabled: !!id && !predicate,
+  });
+
+  //get activities in user Profile
+  const { data: userActivities, isLoading: loadingUserActivities } = useQuery({
+    queryKey: ["user-activities", filter],
+    queryFn: async () => {
+      const response = await agent.get<Activity[]>(
+        `/profiles/${id}/activities`,
+        {
+          params: {
+            filter,
+          },
+        }
+      );
+      return response.data;
+    },
+    enabled: !!id && !!filter,
   });
 
   //get photos
@@ -23,20 +42,22 @@ export const useProfile = (id?: string, predicate?: string) => {
       const { data } = await agent<Photo[]>(`/profiles/${id}/photos`);
       return data;
     },
-     enabled: !!id && !predicate
+    enabled: !!id && !predicate,
   });
 
   //get followings
-   const {data: followings, isLoading: loadingFollowings} = useQuery<Profile[]>({
-
-        queryKey: ['followings', id, predicate],
-        queryFn: async () => {
-            const response = 
-                await agent.get<Profile[]>(`/profiles/${id}/follow-list?predicate=${predicate}`);
-            return response.data;
-        },
-        enabled: !!id && !!predicate
-    })
+  const { data: followings, isLoading: loadingFollowings } = useQuery<
+    Profile[]
+  >({
+    queryKey: ["followings", id, predicate],
+    queryFn: async () => {
+      const response = await agent.get<Profile[]>(
+        `/profiles/${id}/follow-list?predicate=${predicate}`
+      );
+      return response.data;
+    },
+    enabled: !!id && !!predicate,
+  });
 
   //Upload photo
   const uploadPhoto = useMutation({
@@ -135,15 +156,18 @@ export const useProfile = (id?: string, predicate?: string) => {
     },
     onSuccess: () => {
       queryClient.setQueryData(["profile", id], (profile: Profile) => {
-
-        queryClient.invalidateQueries({queryKey: ["followings", id, "followers"]});
+        queryClient.invalidateQueries({
+          queryKey: ["followings", id, "followers"],
+        });
 
         if (!profile || profile.followersCount === undefined) return profile;
 
         return {
           ...profile,
           following: !profile.following,
-          followersCount: profile.following ? profile.followersCount - 1: profile.followersCount + 1,
+          followersCount: profile.following
+            ? profile.followersCount - 1
+            : profile.followersCount + 1,
         };
       });
     },
@@ -166,6 +190,10 @@ export const useProfile = (id?: string, predicate?: string) => {
     updateProfile,
     updateFollowing,
     followings,
-    loadingFollowings
+    loadingFollowings,
+    userActivities,
+    loadingUserActivities,
+    setFilter,
+    filter,
   };
 };

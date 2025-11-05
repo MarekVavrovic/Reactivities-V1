@@ -22,11 +22,10 @@ export default function NavBar() {
   return (
     <Box sx={{ flexGrow: 1 }}>
       <AppBar
-        position="static"
+        position="fixed"
         sx={{
           backgroundImage:
-            "linear-gradient(135deg, #182a73 0%, #218aae 69%, #20a7ac 89%)",
-          position: "relative",
+            "linear-gradient(135deg, #182a73 0%, #218aae 69%, #20a7ac 89%)",          
         }}
       >
         <Container maxWidth="xl">
@@ -63,6 +62,7 @@ export default function NavBar() {
             </Box>
           </Toolbar>
         </Container>
+        
         <Observer>
           {() =>
             uiStore.isLoading ? (
@@ -79,6 +79,7 @@ export default function NavBar() {
             ) : null
           }
         </Observer>
+
       </AppBar>
     </Box>
   );
