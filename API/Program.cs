@@ -25,7 +25,7 @@ builder.Services.AddControllers(opt =>
 
 builder.Services.AddDbContext<AppDbContext>(opt =>
 {
-    opt.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection"));
+    opt.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
 
 //CORS service
@@ -82,12 +82,14 @@ app.UseCors(x => x.AllowAnyHeader().AllowAnyMethod()
 app.UseAuthentication();
 app.UseAuthorization();
 
+//using static files
+app.UseDefaultFiles();
+app.UseStaticFiles();
 
 app.MapControllers();
 app.MapGroup("api").MapIdentityApi<User>(); //api/login
-
-
 app.MapHub<CommentHub>("/comments"); //signalR middleware
+app.MapFallbackToController("Index", "Fallback"); //using static files
 
 using var scope = app.Services.CreateScope();
 var services = scope.ServiceProvider;

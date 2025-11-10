@@ -23,12 +23,12 @@ agent.interceptors.request.use((config) => {
 //targeting response, using response
 agent.interceptors.response.use(
   async (response) => {
-    await sleep(500);
+    if (import.meta.env.DEV) await sleep(1000); //remove fake dalay...
     store.uiStore.isIdle(); //swich off loading
     return response;
   },
   async (error) => {
-    await sleep(500);
+    if (import.meta.env.DEV) await sleep(1000);
     store.uiStore.isIdle();
 
     const { status, data } = error.response;

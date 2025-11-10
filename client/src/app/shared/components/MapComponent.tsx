@@ -1,6 +1,5 @@
-import { MapContainer, Popup, TileLayer, Marker } from "react-leaflet";
-import 'leaflet/dist/leaflet.css';
-
+import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import "leaflet/dist/leaflet.css";
 
 type Props = {
   position: [number, number];
@@ -10,6 +9,7 @@ type Props = {
 export default function MapComponent({ position, venue }: Props) {
   return (
     <MapContainer
+      // @ts-expect-error React-Leaflet v5 typing issue
       center={position}
       zoom={13}
       scrollWheelZoom={false}
